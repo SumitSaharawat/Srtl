@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
+import './App.css';
 
 export default function App() {
   const [files, setFiles] = useState([]);
   const [vehicleId, setVehicleId] = useState('');
+  const [driverName, setDriverName] = useState('');
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+
+  // States for fetching existing images
+  const [searchVehicleId, setSearchVehicleId] = useState('');
+  const [searchDriverName, setSearchDriverName] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [fetchedImageUrls, setFetchedImageUrls] = useState([]);
+  const [fetching, setFetching] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -14,8 +24,8 @@ export default function App() {
   };
 
   const handleUpload = async () => {
-    if (files.length === 0 || !vehicleId) {
-      setError('Please provide at least one file and a vehicle ID.');
+    if (files.length === 0 || !vehicleId || !driverName) {
+      setError('Please provide at least one file, a vehicle ID, and a driver name.');
       return;
     }
     
@@ -28,7 +38,7 @@ export default function App() {
       const uploadPromises = files.map(async (file) => {
         // 1. Get pre-signed upload URL from backend
         const urlRes = await fetch(
-          `http://localhost:3000/get-upload-url?vehicleId=${encodeURIComponent(vehicleId)}&fileType=${encodeURIComponent(file.type)}`
+          `http://localhost:3000/get-upload-url?vehicleId=${encodeURIComponent(vehicleId)}&driverName=${encodeURIComponent(driverName)}&fileType=${encodeURIComponent(file.type)}`
         );
         if (!urlRes.ok) throw new Error('Failed to get upload URL from backend');
         
@@ -68,16 +78,49 @@ export default function App() {
     }
   };
 
+  const handleFetchImages = async () => {
+    if (!searchVehicleId || !searchDriverName || !searchDate) {
+      setFetchError('Please provide a vehicle ID, driver name, and date to search.');
+      return;
+    }
+    
+    setFetching(true);
+    setFetchError(null);
+    setFetchedImageUrls([]);
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/list-images?vehicleId=${encodeURIComponent(searchVehicleId)}&driverName=${encodeURIComponent(searchDriverName)}&date=${encodeURIComponent(searchDate)}`
+      );
+      if (!res.ok) throw new Error('Failed to fetch images from backend');
+      
+      const data = await res.json();
+
+      console.log(data);
+
+      if (data.urls.length === 0) {
+        setFetchError('No images found for this criteria.');
+      } else {
+        setFetchedImageUrls(data.urls);
+      }
+    } catch (err) {
+      console.error(err);
+      setFetchError(err.message);
+    } finally {
+      setFetching(false);
+    }
+  };
+
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem', fontFamily: 'sans-serif' }}>
+    <div className="app-container">
       <h2>Vehicle Image Uploader</h2>
       
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ display: 'block', marginBottom: '.5rem', fontWeight: 'bold' }}>Vehicle ID:</label>
+      <div className="form-group">
+        <label className="form-label">Vehicle ID:</label>
         <select 
           value={vehicleId} 
           onChange={(e) => setVehicleId(e.target.value)} 
-          style={{ width: '100%', padding: '0.5rem' }}
+          className="form-control"
         >
           <option value="" disabled>Select a vehicle...</option>
           <option value="JAG-123">JAG-123 (Jaguar)</option>
@@ -89,49 +132,121 @@ export default function App() {
         </select>
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ display: 'block', marginBottom: '.5rem', fontWeight: 'bold' }}>Image Files:</label>
+      <div className="form-group">
+        <label className="form-label">Driver Name:</label>
+        <input 
+          type="text" 
+          value={driverName} 
+          onChange={(e) => setDriverName(e.target.value)} 
+          className="form-control"
+          placeholder="e.g. John Doe"
+        />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Image Files:</label>
         <input 
           type="file" 
           accept="image/*" 
           multiple
           onChange={handleFileChange} 
-          style={{ width: '100%', padding: '0.5rem' }}
+          className="form-control"
         />
         {files.length > 0 && (
-          <p style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#555' }}>
+          <p className="file-count">
             {files.length} file(s) ready for upload
           </p>
         )}
       </div>
 
-      {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+      {error && <div className="error-message">{error}</div>}
 
       <button 
         onClick={handleUpload} 
         disabled={uploading} 
-        style={{ 
-          padding: '0.75rem 1.5rem', 
-          backgroundColor: '#007bff', 
-          color: 'white', 
-          border: 'none', 
-          borderRadius: '4px',
-          cursor: uploading ? 'not-allowed' : 'pointer'
-        }}
+        className="upload-btn"
       >
         {uploading ? 'Uploading...' : 'Upload Images'}
       </button>
 
       {uploadedImageUrls.length > 0 && (
-        <div style={{ marginTop: '2rem' }}>
-          <h3 style={{ marginBottom: '1rem' }}>Uploaded Images:</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
+        <div className="preview-section">
+          <h3 className="preview-title">Uploaded Images:</h3>
+          <div className="image-grid">
             {uploadedImageUrls.map((url, idx) => (
               <img 
                 key={idx}
                 src={url} 
                 alt={`Uploaded Vehicle ${idx + 1}`} 
-                style={{ width: '100%', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} 
+                className="preview-image"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <hr style={{ margin: '3rem 0', border: 'none', borderTop: '1px solid #ddd' }} />
+      
+      <h2>Search / View Images</h2>
+      
+      <div className="form-group">
+        <label className="form-label">Vehicle ID:</label>
+        <select 
+          value={searchVehicleId} 
+          onChange={(e) => setSearchVehicleId(e.target.value)} 
+          className="form-control"
+        >
+          <option value="" disabled>Select a vehicle...</option>
+          <option value="JAG-123">JAG-123 (Jaguar)</option>
+          <option value="HON-456">HON-456 (Honda)</option>
+          <option value="TOY-789">TOY-789 (Toyota)</option>
+          <option value="BMW-012">BMW-012 (BMW)</option>
+          <option value="AUD-345">AUD-345 (Audi)</option>
+          <option value="MER-678">MER-678 (Mercedes)</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Driver Name:</label>
+        <input 
+          type="text" 
+          value={searchDriverName} 
+          onChange={(e) => setSearchDriverName(e.target.value)} 
+          className="form-control"
+          placeholder="e.g. John Doe"
+        />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Date:</label>
+        <input 
+          type="date" 
+          value={searchDate} 
+          onChange={(e) => setSearchDate(e.target.value)} 
+          className="form-control"
+        />
+      </div>
+
+      {fetchError && <div className="error-message">{fetchError}</div>}
+
+      <button 
+        onClick={handleFetchImages} 
+        disabled={fetching} 
+        className="upload-btn"
+      >
+        {fetching ? 'Fetching...' : 'Fetch Images'}
+      </button>
+
+      {fetchedImageUrls.length > 0 && (
+        <div className="preview-section">
+          <h3 className="preview-title">Fetched Images:</h3>
+          <div className="image-grid">
+            {fetchedImageUrls.map((url, idx) => (
+              <img 
+                key={idx}
+                src={url} 
+                alt={`Fetched Vehicle ${idx + 1}`} 
+                className="preview-image"
               />
             ))}
           </div>
