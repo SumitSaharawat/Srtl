@@ -26,7 +26,8 @@ app.get('/get-upload-url', async (req, res) => {
     const ext = fileType.split('/')[1] || 'jpg';
     
     // Key defines the "folder structure" in S3
-    const key = `uploads/${encodeURIComponent(vehicleId)}/${Date.now()}.${ext}`;
+    const randomId = Math.round(Math.random() * 100000);
+    const key = `uploads/${encodeURIComponent(vehicleId)}/${Date.now()}-${randomId}.${ext}`;
 
     const command = new PutObjectCommand({
         Bucket: process.env.S3_BUCKET_NAME,
