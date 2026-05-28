@@ -14,8 +14,6 @@ const s3 = new S3Client({
 const phototypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
 const getPreSignedUrl = async (req, res) => {
-    console.log("🟢 ENTERED CONTROLLER! Body received:", req.body);
-
     try {
         const { vanNumber, contentType, inspectionType } = req.body;
 
