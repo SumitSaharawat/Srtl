@@ -1,3 +1,214 @@
-body{
-    background-color: grey;
+/* Custom Design Tokens / Root Variables */
+:root {
+  --bg-global: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --secondary: #0ea5e9;
+  --secondary-hover: #0284c7;
+  --success: #22c55e;
+  --success-hover: #16a34a;
+  --border-color: #e2e8f0;
+  --radius: 12px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Reset & Base Setup */
+body {
+  background-color: var(--bg-global);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App Wrapper Box Card */
+.form-container {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-card);
+  margin: 16px;
+  padding: 32px 24px;
+  border-radius: var(--radius);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 
+              0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+}
+
+/* Typography Hierarchy */
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 6px 0;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0 0 28px 0;
+  line-height: 1.5;
+}
+
+/* Structural Form Labels */
+label {
+  display: block;
+  font-weight: 600;
+  margin: 18px 0 6px 2px;
+  color: #334155;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Input Fields & Selection Elements */
+input[type="text"], select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 16px; /* Prevents auto-zooming quirks on iOS mobile devices */
+  font-family: inherit;
+  box-sizing: border-box;
+  color: var(--text-main);
+  background-color: #fff;
+  transition: var(--transition);
+}
+
+input[type="text"]::placeholder {
+  color: #94a3b8;
+}
+
+input[type="text"]:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+/* Side-by-Side Flex Layout Row */
+.name-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.name-row input {
+  flex: 1;
+}
+
+/* Custom Gallery Interactive Trigger Button */
+.camera-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--secondary);
+  color: #ffffff;
+  padding: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  margin-top: 24px;
+  text-transform: none;
+  letter-spacing: 0;
+  transition: var(--transition);
+  box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.15);
+}
+
+.camera-btn:hover {
+  background-color: var(--secondary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px -2px rgba(14, 165, 233, 0.2);
+}
+
+.camera-btn:active {
+  transform: translateY(0);
+}
+
+/* Rendered Preview Display Frame Container */
+.preview-card {
+  margin-top: 18px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  height: 240px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.preview-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Asynchronous State Feedback Banner */
+.status-loader {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: pulse 1.8s infinite ease-in-out;
+}
+
+/* Primary Execution Button */
+.submit-btn {
+  width: 100%;
+  background-color: var(--success);
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 8px;
+  margin-top: 24px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
+}
+
+.submit-btn:not(:disabled):hover {
+  background-color: var(--success-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px -2px rgba(34, 197, 94, 0.25);
+}
+
+.submit-btn:disabled {
+  background-color: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Layout Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }

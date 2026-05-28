@@ -19,7 +19,7 @@ const inspectionsSchema = new mongoose.Schema({
         required: true
     },
     s3Key:{
-        type: String,
+        type: [String],
         required: true
     },
     inspectionDate:{
