@@ -1,16 +1,17 @@
-/* --- Full Window Frame Adjustments --- */
+/* --- Global Reset & Fluid Height Layout Config --- */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   background-color: #0f172a;
+  overflow: hidden; /* Lock the primary window body framework entirely solid */
 }
 
 .split-dashboard-wrapper {
-  width: 100%;
-  min-height: 100vh;
-  padding: 20px;
+  width: 100vw;
+  height: 100vh;
+  padding: 16px;
   background-color: #0f172a; 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   box-sizing: border-box;
@@ -19,15 +20,15 @@ html, body {
 }
 
 .global-dashboard-header {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   border-bottom: 1px solid #334155;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
 }
 
 .global-dashboard-header h2 {
   color: #f8fafc;
-  margin: 0 0 4px 0;
-  font-size: 22px;
+  margin: 0 0 2px 0;
+  font-size: 20px;
   font-weight: 700;
 }
 
@@ -37,26 +38,28 @@ html, body {
   font-size: 13px;
 }
 
-/* --- THE SPLIT FULL-WIDTH VIEWPORT ENGINE --- */
+/* --- TRUE EDGE-TO-EDGE VIEWPORT LAYOUT CONTAINER --- */
 .dual-viewport-container {
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  flex: 1;
+  gap: 16px;
+  align-items: stretch;
+  flex: 1; /* Instructs container to swallow up 100% of the remaining screen depth */
   width: 100%;
+  height: calc(100vh - 80px);
 }
 
 .dashboard-panel {
   flex: 1;
   background: #1e293b;
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 16px;
   border: 1px solid #334155;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 110px); /* Locks panels to screen height, preventing full-page scrolling */
+  position: relative;
+  overflow: hidden; /* Prevents contents from expanding outside panel boundaries */
 }
 
 .left-panel { border-top: 4px solid #3b82f6; }
@@ -64,21 +67,21 @@ html, body {
 
 .panel-header-badge h3 {
   margin: 0 0 12px 0;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 1px;
   font-weight: 700;
-  color: #94a3b8;
+  color: #64748b;
 }
 
-/* --- FILTER BOX BAR PANEL ELEMENTS --- */
+/* --- CONDENSED FILTER PANEL UI --- */
 .filter-bar-mini {
   background: #0f172a;
   padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  border-radius: 6px;
+  margin-bottom: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .filter-field-row {
@@ -95,7 +98,7 @@ html, body {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  color: #64748b;
+  color: #475569;
   margin-bottom: 2px;
 }
 
@@ -104,147 +107,141 @@ html, body {
   width: 100%;
   padding: 6px 10px;
   background: #1e293b;
-  border: 1px solid #475569;
-  border-radius: 6px;
+  border: 1px solid #334155;
+  border-radius: 4px;
   color: #f8fafc;
   font-size: 12px;
   outline: none;
-  box-sizing: border-box;
 }
 
-/* --- INDEPENDENT SCROLLING PANELS --- */
+/* --- COMPACT RECORDS SCROLL VIEW --- */
 .panel-feed {
   display: flex;
   flex-direction: column;
   gap: 10px;
   flex: 1;
-  overflow-y: auto; /* Lets Left and Right scroll entirely independently of each other */
-  padding-right: 4px;
+  overflow-y: auto;
 }
 
-.panel-feed::-webkit-scrollbar { width: 6px; }
-.panel-feed::-webkit-scrollbar-track { background: #1e293b; }
+.panel-feed::-webkit-scrollbar { width: 4px; }
 .panel-feed::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
 
 .mini-record-card {
-  background: #334155;
-  border-radius: 8px;
+  background: #273549;
+  border-radius: 6px;
   padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  border-left: 3px solid #4b5563;
 }
 
-.mini-meta h4 {
-  margin: 0 0 4px 0;
-  font-size: 15px;
-  color: #f1f5f9;
-}
+.mini-meta h4 { margin: 0 0 4px 0; font-size: 14px; color: #f1f5f9; }
+.type-badge-mini { font-size: 9px; background: #0f172a; color: #38bdf8; padding: 1px 4px; border-radius: 3px; }
+.mini-meta p { margin: 2px 0; font-size: 12px; color: #cbd5e1; }
+.mini-meta .timestamp { font-size: 10px; color: #94a3b8; }
 
-.type-badge-mini {
-  font-size: 9px;
-  background: #1e293b;
-  color: #38bdf8;
-  padding: 1px 5px;
-  border-radius: 4px;
-}
-
-.mini-meta p {
-  margin: 2px 0;
-  font-size: 12px;
-  color: #cbd5e1;
-}
-
-.mini-meta .timestamp {
-  font-size: 10px;
-  color: #94a3b8;
-}
-
-/* --- MEDIUM BOX MATRIX THUMBNAILS --- */
-.mini-gallery {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.mini-gallery { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
 
 .mini-lightbox-trigger {
   display: block;
-  width: 90px;  /* Clean medium bounding box constraint */
-  height: 90px; /* Clean medium bounding box constraint */
-  border-radius: 6px;
+  width: 90px;
+  height: 90px;
+  border-radius: 4px;
   overflow: hidden;
   border: 1px solid #475569;
-  background: #0f172a;
-  cursor: zoom-in; /* Changes mouse icon to indicate viewing action */
-  transition: transform 0.12s ease-in-out;
-}
-
-.mini-lightbox-trigger:hover {
-  transform: scale(1.04);
-  border-color: #3b82f6;
-}
-
-.mini-lightbox-trigger img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* --- INLINE MODAL LIGHTBOX OVERLAY WINDOW --- */
-.inline-lightbox-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(2, 6, 17, 0.92); /* Heavy dark overlay glass effect */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999; /* Positions window above all panel hierarchies */
-  animation: fadeInModal 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: zoom-out;
-}
-
-.lightbox-content-wrapper {
-  position: relative;
-  max-width: 90%;
-  max-height: 85%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.lightbox-content-wrapper img {
-  max-width: 100%;
-  max-height: 100vh;
-  object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1px solid #334155;
-}
-
-.lightbox-close-corner {
-  position: absolute;
-  top: -45px;
-  right: 0;
-  background: none;
-  border: none;
-  color: #94a3b8;
-  font-size: 24px;
   cursor: pointer;
-  transition: color 0.15s;
 }
 
-.lightbox-close-corner:hover {
-  color: #ffffff;
+.mini-lightbox-trigger img { width: 100%; height: 100%; object-fit: cover; }
+
+/* --- 🌟 INSIDE-PANEL INLINE PREVIEW LIGHTBOX --- */
+.panel-inline-lightbox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #0f172a;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  animation: slidePanelIn 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Core Animations */
-@keyframes fadeInModal {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.inline-lightbox-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background-color: #1e293b;
+  border-bottom: 1px solid #334155;
 }
 
-.mini-loader { text-align: center; color: #38bdf8; font-size: 11px; margin-bottom: 8px; }
-.no-records-mini { text-align: center; color: #64748b; font-style: italic; font-size: 12px; padding: 15px; }
+.inline-lightbox-controls span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.close-inline-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.close-inline-btn:hover {
+  background: #dc2626;
+}
+
+.inline-lightbox-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: #020617;
+}
+
+.inline-lightbox-body img {
+  max-width: 100%;
+  max-height: calc(100vh - 200px); /* Bounds image layout boundaries cleanly inside its container depth box */
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* Animations */
+@keyframes slidePanelIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.mini-loader { text-align: center; color: #38bdf8; font-size: 11px; }
+.no-records-mini { text-align: center; color: #64748b; font-style: italic; font-size: 12px; padding: 10px; }
+
+/* --- INITIAL IDLE VIEWSTATE PRESENTATION STYLES --- */
+.panel-idle-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 80%;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.panel-idle-state p {
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.panel-idle-state span {
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.6;
+  max-width: 280px;
+}

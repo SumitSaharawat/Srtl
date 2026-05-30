@@ -212,3 +212,36 @@ input[type="text"]:focus, select:focus {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
+
+/* --- MEDIUM-SIZED GRID THUMBNAILS FOR DRIVER UPLOAD --- */
+.multi-preview-grid {
+  display: grid;
+  /* Automatically wraps images in neat rows using our medium size configuration */
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: start;
+}
+
+.grid-preview-card {
+  width: 90px;      /* Medium width constraint matching dashboard spec */
+  height: 90px;     /* Medium height constraint matching dashboard spec */
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  background-color: #f8fafc;
+  animation: previewFadeIn 0.2s ease-in-out;
+}
+
+.grid-preview-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Crops phone aspects cleanly without squishing the dimensions */
+}
+
+/* Smooth entry animation for newly chosen photos */
+@keyframes previewFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
