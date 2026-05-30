@@ -22,3 +22,8 @@ export const submitInspectionLog = async (payload) => {
   const response = await axios.post(`${API_BASE_URL}/submit-inspection`, payload);
   return response.data;
 };
+
+export const getDashboardRecords = async (params) => {
+  const response = await axios.get(`${API_BASE_URL}/dashboard`, { params });
+  return response.data;
+};

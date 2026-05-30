@@ -1,0 +1,250 @@
+/* --- Full Window Frame Adjustments --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #0f172a;
+}
+
+.split-dashboard-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #0f172a; 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.global-dashboard-header {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 12px;
+}
+
+.global-dashboard-header h2 {
+  color: #f8fafc;
+  margin: 0 0 4px 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.global-dashboard-header p {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 13px;
+}
+
+/* --- THE SPLIT FULL-WIDTH VIEWPORT ENGINE --- */
+.dual-viewport-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex: 1;
+  width: 100%;
+}
+
+.dashboard-panel {
+  flex: 1;
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #334155;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 110px); /* Locks panels to screen height, preventing full-page scrolling */
+}
+
+.left-panel { border-top: 4px solid #3b82f6; }
+.right-panel { border-top: 4px solid #0ea5e9; }
+
+.panel-header-badge h3 {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+/* --- FILTER BOX BAR PANEL ELEMENTS --- */
+.filter-bar-mini {
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-field-row {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-field-row > div {
+  flex: 1;
+}
+
+.filter-bar-mini label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.filter-bar-mini input,
+.filter-bar-mini select {
+  width: 100%;
+  padding: 6px 10px;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  color: #f8fafc;
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* --- INDEPENDENT SCROLLING PANELS --- */
+.panel-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  overflow-y: auto; /* Lets Left and Right scroll entirely independently of each other */
+  padding-right: 4px;
+}
+
+.panel-feed::-webkit-scrollbar { width: 6px; }
+.panel-feed::-webkit-scrollbar-track { background: #1e293b; }
+.panel-feed::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+.mini-record-card {
+  background: #334155;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mini-meta h4 {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  color: #f1f5f9;
+}
+
+.type-badge-mini {
+  font-size: 9px;
+  background: #1e293b;
+  color: #38bdf8;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.mini-meta p {
+  margin: 2px 0;
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+.mini-meta .timestamp {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+/* --- MEDIUM BOX MATRIX THUMBNAILS --- */
+.mini-gallery {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mini-lightbox-trigger {
+  display: block;
+  width: 90px;  /* Clean medium bounding box constraint */
+  height: 90px; /* Clean medium bounding box constraint */
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #475569;
+  background: #0f172a;
+  cursor: zoom-in; /* Changes mouse icon to indicate viewing action */
+  transition: transform 0.12s ease-in-out;
+}
+
+.mini-lightbox-trigger:hover {
+  transform: scale(1.04);
+  border-color: #3b82f6;
+}
+
+.mini-lightbox-trigger img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- INLINE MODAL LIGHTBOX OVERLAY WINDOW --- */
+.inline-lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(2, 6, 17, 0.92); /* Heavy dark overlay glass effect */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* Positions window above all panel hierarchies */
+  animation: fadeInModal 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: zoom-out;
+}
+
+.lightbox-content-wrapper {
+  position: relative;
+  max-width: 90%;
+  max-height: 85%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-content-wrapper img {
+  max-width: 100%;
+  max-height: 100vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid #334155;
+}
+
+.lightbox-close-corner {
+  position: absolute;
+  top: -45px;
+  right: 0;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.lightbox-close-corner:hover {
+  color: #ffffff;
+}
+
+/* Core Animations */
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mini-loader { text-align: center; color: #38bdf8; font-size: 11px; margin-bottom: 8px; }
+.no-records-mini { text-align: center; color: #64748b; font-style: italic; font-size: 12px; padding: 15px; }

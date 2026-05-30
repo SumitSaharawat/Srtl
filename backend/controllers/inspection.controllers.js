@@ -75,4 +75,54 @@ const submitInspection = async (req, res) => {
     }
 }
 
-module.exports = { getPreSignedUrl, submitInspection };
+// Add this to your existing controller file
+const getDashboardInspections = async (req, res) => {
+    try {
+        const { vanNumber, name, date, inspectionType } = req.query;
+        let queryCondition = {};
+
+        // 1. Filter by exact Van Identifier match
+        if (vanNumber) {
+            queryCondition.vanNumber = vanNumber;
+        }
+
+        // 2. Filter by Inspection Type enum ('before' or 'after')
+        if (inspectionType) {
+            queryCondition.inspectionType = inspectionType;
+        }
+
+        // 3. Filter by Name (Matches first OR last name dynamically using regex case-insensitive search)
+        if (name) {
+            queryCondition.$or = [
+                { firstName: { $regex: name, $options: 'i' } },
+                { lastName: { $regex: name, $options: 'i' } }
+            ];
+        }
+
+        // 4. Filter by Date Range (Queries from 00:00:00 to 23:59:59 of the selected day)
+        if (date) {
+            const startOfDay = new Date(date);
+            startOfDay.setUTCHours(0, 0, 0, 0);
+
+            const endOfDay = new Date(date);
+            endOfDay.setUTCHours(23, 59, 59, 999);
+
+            queryCondition.inspectionDate = {
+                $gte: startOfDay,
+                $lte: endOfDay
+            };
+        }
+
+        // Fetch records from MongoDB matching our dynamic criteria, sorted newest first
+        const records = await inspectionModel.find(queryCondition).sort({ inspectionDate: -1 });
+        
+        return res.status(200).json({ count: records.length, records });
+
+    } catch (err) {
+        console.error("Dashboard Fetch Error:", err);
+        return res.status(500).json({ message: err.message });
+    }
+};
+
+// Update your exports block at the bottom of the controller file:
+module.exports = { getPreSignedUrl, submitInspection, getDashboardInspections };
