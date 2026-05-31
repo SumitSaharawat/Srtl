@@ -181,7 +181,6 @@ function Dashboard() {
     <div className="split-dashboard-wrapper">
       <div className="global-dashboard-header">
         <h2>Fleet Inspection Split-Screen Control Room</h2>
-        <p>Set filters independently. Click thumbnails to inspect photos directly inside that workspace window.</p>
       </div>
       
       <div className="dual-viewport-container">
