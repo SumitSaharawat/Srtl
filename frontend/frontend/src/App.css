@@ -36,3 +36,24 @@
   background-color: #3b82f6;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
+
+/* --- RESPONSIVE MEDIA QUERIES (Mobile) --- */
+@media (max-width: 480px) {
+  .nav-container {
+    right: 50%;
+    transform: translateX(50%); /* Centers the floating nav on small screens */
+    width: 92%; /* Stops it from bleeding off the screen edges */
+    flex-wrap: wrap; /* Allows links to stack on top of each other if needed */
+    justify-content: center;
+    border-radius: 16px; /* Slightly soften radius for a multi-line block */
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .nav-link {
+    font-size: 11px; /* Slightly smaller text for phones */
+    padding: 8px 12px; /* Tighter padding */
+    flex: 1 1 30%; /* Forces the buttons into an evenly distributed row/grid */
+    text-align: center;
+  }
+}

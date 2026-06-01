@@ -31,7 +31,7 @@ body {
 
 /* App Wrapper Box Card */
 .form-container {
-  width: 100%;
+  width: calc(100% - 32px);
   max-width: 460px;
   background: var(--bg-card);
   margin: 16px;
@@ -244,4 +244,26 @@ input[type="text"]:focus, select:focus {
 @keyframes previewFadeIn {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
+}
+
+/* --- RESPONSIVE MEDIA QUERIES (Mobile & Tablet) --- */
+@media (max-width: 600px) {
+  .form-container {
+    padding: 24px 16px;
+    margin: 16px auto;
+  }
+
+  .name-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .multi-preview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+  }
+
+  .grid-preview-card {
+    width: 75px;
+    height: 75px;
+  }
 }

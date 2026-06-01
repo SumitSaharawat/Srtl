@@ -180,7 +180,7 @@ function Dashboard() {
   return (
     <div className="split-dashboard-wrapper">
       <div className="global-dashboard-header">
-        <h2>Fleet Inspection Split-Screen Control Room</h2>
+        <h2>Fleet Inspection</h2>
       </div>
       
       <div className="dual-viewport-container">
