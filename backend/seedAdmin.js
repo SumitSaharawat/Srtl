@@ -1,7 +1,9 @@
 // seedAdmin.js
-require('dotenv').config(); // Loads properties from .env
+const path = require('path');
+// The '..' tells Node to look out of 'db' and into the main 'backend' folder
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const Admin = require('./models/admin.models');
 
 const seedInitialAdmin = async () => {
@@ -16,7 +18,7 @@ const seedInitialAdmin = async () => {
             process.exit(1);
         }
 
-        await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(`${process.env.MONGODB_URL}/${process.env.DB_NAME}`)
         console.log('Connected to MongoDB...');
 
         // Check if user already exists

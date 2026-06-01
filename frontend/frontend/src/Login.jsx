@@ -1,6 +1,7 @@
 // src/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './Login.css';
 
 function Login({ onLoginSuccess }) {
@@ -11,28 +12,33 @@ function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    // --- 🛑 DEPLOYMENT NOTE FOR PRODUCTION ---
-    // For local testing, we look for this hardcoded manager profile match block.
-    // In production, swap this for an axios.post() call hitting a secure backend database verification route!
-    if (username === 'admin' && password === 'SRTL_secure_2026') {
-      
-      // Authorize browser session memory tracks
-      localStorage.setItem('isAdminAuthenticated', 'true');
-      
-      // Update our top-level routing switch state
-      onLoginSuccess();
-      
-      // Smoothly push manager into the control room workspace
-      navigate('/dashboard');
-    } else {
-      setError('Invalid Manager Credentials. Access Denied.');
-      setLoading(false);
-    }
-  };
+  try {
+    const response = await axios.post('http://localhost:8000/api/auth/login', {
+      username,
+      password,
+    });
+
+    // Extract the cryptographic token from our secure server response
+    const { token } = response.data;
+
+    // Save token and session states securely inside browser cache storage
+    localStorage.setItem('isAdminAuthenticated', 'true');
+    localStorage.setItem('adminToken', token);
+
+    onLoginSuccess();
+    navigate('/dashboard');
+
+  } catch (error) {
+    console.error('Authentication failure:', error);
+    setError(error.response?.data?.message || 'Connection timeout. Terminal authorization failed.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="login-canvas">
