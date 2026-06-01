@@ -79,6 +79,12 @@ function Dashboard() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('isAdminAuthenticated');
+    localStorage.removeItem('adminToken');
+    window.location.href = '/login'; // Instantly route them out of active memory grids
+};
+
   const renderDashboardPanel = (side, filters, records, loading, maximizedImg, setMaximizedImg) => {
     const isSearching = hasActiveFilters(filters);
 
@@ -181,6 +187,7 @@ function Dashboard() {
     <div className="split-dashboard-wrapper">
       <div className="global-dashboard-header">
         <h2>Fleet Inspection</h2>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </div>
       
       <div className="dual-viewport-container">

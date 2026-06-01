@@ -33,3 +33,15 @@ describe('🔒 Authentication API Automation Suite', () => {
     expect(res.body).toHaveProperty('token'); // Verifies token generation pipeline
   });
 });
+
+describe('🛡️ Protected Dashboard Route Automation', () => {
+
+  it(' should REJECT access to the dashboard if no token is provided', async () => {
+      const res = await request(app)
+          .get('/api/auth/dashboard');
+      
+      // Should be blocked by your verifyAdminToken middleware
+      expect(res.statusCode).toEqual(403); 
+      expect(res.body.message).toContain('Token missing');
+  });
+});
