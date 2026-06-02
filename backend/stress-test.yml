@@ -1,0 +1,38 @@
+config:
+  target: "http://localhost:8000"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: "1. Baseline Warmup"
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 50         # 📈 Gradual climb: Ramps from 5 to 50 new drivers arriving every single second
+      name: "2. Heavy Ramp Stress"
+    - duration: 30
+      arrivalRate: 100    # 🔨 The Hammer Phase: Sustains an intense spike of 100 new drivers every second
+      name: "3. Absolute Peak Max Load Check"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "Driver Multi-Angle Asset Inspection Journey"
+    flow:
+      - post:
+          url: "/api/inspections/get-presigned-url"
+          json:
+            vanNumber: "Van-99"
+            contentType: "image/jpeg"
+            inspectionType: "before"
+          capture:
+            - json: "$.s3Key"
+              as: "capturedS3Key"
+      - think: 1 # Decreased think time to compound the concurrent database stress
+      - post:
+          url: "/api/inspections/submit-inspection"
+          json:
+            vanNumber: "Van-99"
+            firstName: "Stress"
+            lastName: "Test-User"
+            inspectionType: "before"
+            s3Key: "{{ capturedS3Key }}"
