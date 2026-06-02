@@ -1,0 +1,44 @@
+config:
+  target: "http://localhost:8000" # Match your backend port
+  phases:
+    - duration: 60          # Phase 1: Morning Shift Starts
+      arrivalRate: 2        # Generates 2 new virtual drivers every second for 1 minute
+      name: "Steady Morning Inflow"
+    - duration: 30          # Phase 2: Peak Shift Change Rush Hour Spike
+      arrivalRate: 5        # Ramps up to 5 new virtual drivers every second
+      rampTo: 15
+      name: "End of Shift Rush Hour Spike"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "Driver Multi-Angle Asset Inspection Journey"
+    flow:
+      # Step 1: Request a secure URL using exact key mappings
+      - post:
+          url: "/api/inspections/get-presigned-url"
+          json:
+            vanNumber: "Van-04"
+            contentType: "image/jpeg"     # ✅ Match your phototypes array check
+            inspectionType: "before"      # ✅ Match your validation string parameter
+          capture:
+            # Captures your backend's returned 'uploadUrl' key to confirm it generated
+            - json: "$.uploadUrl" 
+              as: "mockUrl"
+            # Captures your generated path string so we can use it to submit to MongoDB below
+            - json: "$.s3Key" 
+              as: "capturedS3Key"
+
+      # Step 2: Introduce a realistic 3-second human pause while "images compress" in browser
+      - think: 3
+
+      # Step 3: Log the final asset parameters directly inside your MongoDB database schema collection
+      - post:
+          url: "/api/inspections/submit-inspection"
+          json:
+            vanNumber: "Van-04"
+            firstName: "Automated"
+            lastName: "Test-Driver"
+            inspectionType: "before"
+            s3Key: "{{ capturedS3Key }}" # ✅ Reuses the exact custom path variable generated in Step 1!
