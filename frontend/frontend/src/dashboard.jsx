@@ -120,6 +120,7 @@ function Dashboard() {
                     <option value="Van-01">Van 01</option>
                     <option value="Van-02">Van 02</option>
                     <option value="Van-03">Van 03</option>
+                    <option value="Van-04">Van 04</option>
                   </select>
                 </div>
               </div>
