@@ -75,10 +75,10 @@ const submitInspection = async (req, res) => {
     }
 }
 
-// Add this to your existing controller file
 const getDashboardInspections = async (req, res) => {
     try {
-        const { vanNumber, name, date, inspectionType } = req.query;
+        // 💡 ADDED: Destructure page and limit from req.query with sensible defaults
+        const { vanNumber, name, date, inspectionType, page = 1, limit = 20 } = req.query;
         let queryCondition = {};
 
         // 1. Filter by exact Van Identifier match
@@ -113,10 +113,28 @@ const getDashboardInspections = async (req, res) => {
             };
         }
 
-        // Fetch records from MongoDB matching our dynamic criteria, sorted newest first
-        const records = await inspectionModel.find(queryCondition).sort({ inspectionDate: -1 });
+        // 💡 ADDED: Parse strings to numbers and calculate skipping offset
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+        const skipAmount = (pageNumber - 1) * limitNumber;
+
+        // 💡 OPTIMIZED: Fetch ONLY the matching subset of records for the active page
+        const records = await inspectionModel.find(queryCondition)
+            .sort({ inspectionDate: -1 })
+            .skip(skipAmount)
+            .limit(limitNumber);
         
-        return res.status(200).json({ count: records.length, records });
+        // 💡 ADDED: Efficiently fetch the total document count matching this specific query
+        const totalRecords = await inspectionModel.countDocuments(queryCondition);
+        
+        // 💡 MODIFIED: Return pagination metadata so your UI knows how many page links to build
+        return res.status(200).json({ 
+            count: records.length, 
+            total: totalRecords,
+            currentPage: pageNumber,
+            totalPages: Math.ceil(totalRecords / limitNumber),
+            records 
+        });
 
     } catch (err) {
         console.error("Dashboard Fetch Error:", err);

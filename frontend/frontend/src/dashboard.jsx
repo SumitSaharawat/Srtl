@@ -10,29 +10,33 @@ function Dashboard() {
   const [leftFilters, setLeftFilters] = useState({ vanNumber: '', name: '', date: '', inspectionType: '' });
   const [leftLoading, setLeftLoading] = useState(false);
   const [leftMaximizedImg, setLeftMaximizedImg] = useState(null);
+  const [leftPage, setLeftPage] = useState(1);
+  const [leftTotalPages, setLeftTotalPages] = useState(1);
 
   // RIGHT PANEL STATE
   const [rightRecords, setRightRecords] = useState([]);
   const [rightFilters, setRightFilters] = useState({ vanNumber: '', name: '', date: '', inspectionType: '' });
   const [rightLoading, setRightLoading] = useState(false);
   const [rightMaximizedImg, setRightMaximizedImg] = useState(null);
+  const [rightPage, setRightPage] = useState(1);
+  const [rightTotalPages, setRightTotalPages] = useState(1);
 
   const handleFilterChange = (panel, e) => {
     const { name, value } = e.target;
     if (panel === 'left') {
       setLeftFilters(prev => ({ ...prev, [name]: value }));
+      setLeftPage(1); // 💡 Reset page to 1 on filter adjustment to keep queries healthy
     } else {
       setRightFilters(prev => ({ ...prev, [name]: value }));
+      setRightPage(1); // 💡 Reset page to 1 on filter adjustment to keep queries healthy
     }
   };
 
-  // Helper check to determine if the manager has modified at least one form value
   const hasActiveFilters = (filters) => {
     return Object.values(filters).some(value => value !== '');
   };
 
   const fetchLeftInspections = useCallback(async () => {
-    // GUARD: If no search parameters are typed or selected, clear state and abort query execution
     if (!hasActiveFilters(leftFilters)) {
       setLeftRecords([]);
       return;
@@ -40,17 +44,17 @@ function Dashboard() {
 
     setLeftLoading(true);
     try {
-      const data = await getDashboardRecords(leftFilters);
+      const data = await getDashboardRecords({ ...leftFilters, page: leftPage, limit: 20 });
       setLeftRecords(data.records);
+      setLeftTotalPages(data.totalPages || 1); 
     } catch (error) {
       console.error('Error fetching left records:', error);
     } finally {
       setLeftLoading(false);
     }
-  }, [leftFilters]);
+  }, [leftFilters, leftPage]); 
 
   const fetchRightInspections = useCallback(async () => {
-    // GUARD: If no search parameters are typed or selected, clear state and abort query execution
     if (!hasActiveFilters(rightFilters)) {
       setRightRecords([]);
       return;
@@ -58,14 +62,15 @@ function Dashboard() {
 
     setRightLoading(true);
     try {
-      const data = await getDashboardRecords(rightFilters);
+      const data = await getDashboardRecords({ ...rightFilters, page: rightPage, limit: 20 });
       setRightRecords(data.records);
+      setRightTotalPages(data.totalPages || 1); 
     } catch (error) {
       console.error('Error fetching right records:', error);
     } finally {
       setRightLoading(false);
     }
-  }, [rightFilters]);
+  }, [rightFilters, rightPage]); 
 
   useEffect(() => { fetchLeftInspections(); }, [fetchLeftInspections]);
   useEffect(() => { fetchRightInspections(); }, [fetchRightInspections]);
@@ -82,10 +87,11 @@ function Dashboard() {
   const handleLogout = () => {
     localStorage.removeItem('isAdminAuthenticated');
     localStorage.removeItem('adminToken');
-    window.location.href = '/login'; // Instantly route them out of active memory grids
-};
+    window.location.href = '/login'; 
+  };
 
-  const renderDashboardPanel = (side, filters, records, loading, maximizedImg, setMaximizedImg) => {
+  // 💡 Updated to accept panel page and page controls parameter strings dynamically
+  const renderDashboardPanel = (side, filters, records, loading, maximizedImg, setMaximizedImg, currentPage, totalPages, setCurrentPage) => {
     const isSearching = hasActiveFilters(filters);
 
     return (
@@ -152,30 +158,53 @@ function Dashboard() {
               ) : records.length === 0 ? (
                 <p className="no-records-mini">No matching logs found for this filter combination.</p>
               ) : (
-                records.map((log) => (
-                  <div key={log._id} className="mini-record-card">
-                    <div className="mini-meta">
-                      <h4>{log.vanNumber} - <span className="type-badge-mini">{log.inspectionType}</span></h4>
-                      <p><strong>Driver:</strong> {log.firstName} {log.lastName}</p>
-                      <p className="timestamp">📅 {new Date(log.inspectionDate).toLocaleDateString()} {new Date(log.inspectionDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                <>
+                  {records.map((log) => (
+                    <div key={log._id} className="mini-record-card">
+                      <div className="mini-meta">
+                        <h4>{log.vanNumber} - <span className="type-badge-mini">{log.inspectionType}</span></h4>
+                        <p><strong>Driver:</strong> {log.firstName} {log.lastName}</p>
+                        <p className="timestamp">📅 {new Date(log.inspectionDate).toLocaleDateString()} {new Date(log.inspectionDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                      </div>
+                      <div className="mini-gallery">
+                        {log.s3Key.map((key, idx) => {
+                          const fullUrl = `${S3_BASE_URL}/${key}`;
+                          return (
+                            <a 
+                              key={idx} 
+                              href={fullUrl} 
+                              className="mini-lightbox-trigger"
+                              onClick={(e) => handleImageOpen(e, side, fullUrl)}
+                            >
+                              <img src={fullUrl} alt="Van Grid Thumbnail" />
+                            </a>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <div className="mini-gallery">
-                      {log.s3Key.map((key, idx) => {
-                        const fullUrl = `${S3_BASE_URL}/${key}`;
-                        return (
-                          <a 
-                            key={idx} 
-                            href={fullUrl} 
-                            className="mini-lightbox-trigger"
-                            onClick={(e) => handleImageOpen(e, side, fullUrl)}
-                          >
-                            <img src={fullUrl} alt="Van Grid Thumbnail" />
-                          </a>
-                        );
-                      })}
+                  ))}
+
+                  {/* 💡 ADDED: Pagination navigation button blocks layout inside view panel */}
+                  {totalPages > 1 && (
+                    <div className="dashboard-pagination-navbar">
+                      <button 
+                        className="pag-nav-btn"
+                        disabled={currentPage <= 1} 
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      >
+                        ◀ Previous
+                      </button>
+                      <span className="pag-nav-info">Page <strong>{currentPage}</strong> of {totalPages}</span>
+                      <button 
+                        className="pag-nav-btn"
+                        disabled={currentPage >= totalPages} 
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      >
+                        Next ▶
+                      </button>
                     </div>
-                  </div>
-                ))
+                  )}
+                </>
               )}
             </div>
           </>
@@ -192,8 +221,10 @@ function Dashboard() {
       </div>
       
       <div className="dual-viewport-container">
-        {renderDashboardPanel('left', leftFilters, leftRecords, leftLoading, leftMaximizedImg, setLeftMaximizedImg)}
-        {renderDashboardPanel('right', rightFilters, rightRecords, rightLoading, rightMaximizedImg, setRightMaximizedImg)}
+        {/* Pass state variables for the Left panel */}
+        {renderDashboardPanel('left', leftFilters, leftRecords, leftLoading, leftMaximizedImg, setLeftMaximizedImg, leftPage, leftTotalPages, setLeftPage)}
+        {/* Pass state variables for the Right panel */}
+        {renderDashboardPanel('right', rightFilters, rightRecords, rightLoading, rightMaximizedImg, setRightMaximizedImg, rightPage, rightTotalPages, setRightPage)}
       </div>
     </div>
   );

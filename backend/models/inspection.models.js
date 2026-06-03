@@ -24,8 +24,11 @@ const inspectionsSchema = new mongoose.Schema({
     },
     inspectionDate:{
         type: Date,
-        default: Date.now
+        default: Date.now,
+        index: true
     }
 });
+
+inspectionsSchema.index({ vanNumber: 1, inspectionDate: -1 });
 
 module.exports = mongoose.model('Inspection', inspectionsSchema);
