@@ -142,5 +142,4 @@ const getDashboardInspections = async (req, res) => {
     }
 };
 
-// Update your exports block at the bottom of the controller file:
 module.exports = { getPreSignedUrl, submitInspection, getDashboardInspections };
