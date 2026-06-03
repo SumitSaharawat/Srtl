@@ -23,7 +23,7 @@ describe('📋 Fleet Inspection Automation Suite', () => {
     afterAll(async () => {
         // Purge test generation records clean to keep MongoDB empty and pristine
         await inspectionModel.deleteMany({ firstName: { $regex: 'Test-Automation', $options: 'i' } });
-        await mongoose.connection.close();
+        //await mongoose.connection.close();
     });
 
     beforeEach(async () => {
